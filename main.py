@@ -29,7 +29,13 @@ def main() -> int:
     out = Path("/output/entry.txt")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(ROAST, encoding="utf-8")
-    print(f"wrote {len(ROAST)} chars to {out}")
+    # Round-trip check: what the grader reads back must be byte-identical
+    # to the validated line, so a partial or re-encoded write cannot slip
+    # through as a valid-looking entry.
+    written = out.read_text(encoding="utf-8")
+    if written != ROAST:
+        raise ValueError("round-trip mismatch: /output/entry.txt differs from the roast")
+    print(f"wrote {len(ROAST)} chars to {out} (verified)")
     return 0
 
 
